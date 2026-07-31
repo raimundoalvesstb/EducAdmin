@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: educadmin_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${EDUCADMIN_BD_USUARIO}
+      POSTGRES_PASSWORD: ${EDUCADMIN_BD_SENHA}
+      POSTGRES_DB: ${EDUCADMIN_BD_NOME}
+    ports:
+      - "${EDUCADMIN_BD_PORTA:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${EDUCADMIN_BD_USUARIO} -d ${EDUCADMIN_BD_NOME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: educadmin_redis
+    restart: always
+    ports:
+      - "${EDUCADMIN_REDIS_PORTA:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio
+    container_name: educadmin_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${EDUCADMIN_MINIO_USUARIO}
+      MINIO_ROOT_PASSWORD: ${EDUCADMIN_MINIO_SENHA}
+    ports:
+      - "${EDUCADMIN_MINIO_PORTA:-9000}:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: educadmin_api
+    restart: always
+    environment:
+      - EDUCADMIN_AMBIENTE=${EDUCADMIN_AMBIENTE}
+      - EDUCADMIN_PORTA_API=${EDUCADMIN_PORTA_API}
+      - EDUCADMIN_BD_SERVIDOR=${EDUCADMIN_BD_SERVIDOR}
+      - EDUCADMIN_BD_PORTA=${EDUCADMIN_BD_PORTA}
+      - EDUCADMIN_BD_NOME=${EDUCADMIN_BD_NOME}
+      - EDUCADMIN_BD_USUARIO=${EDUCADMIN_BD_USUARIO}
+      - EDUCADMIN_BD_SENHA=${EDUCADMIN_BD_SENHA}
+      - EDUCADMIN_REDIS_SERVIDOR=${EDUCADMIN_REDIS_SERVIDOR}
+      - EDUCADMIN_REDIS_PORTA=${EDUCADMIN_REDIS_PORTA}
+      - EDUCADMIN_JWT_SEGREDO=${EDUCADMIN_JWT_SEGREDO}
+      - EDUCADMIN_JWT_EXPIRACAO=${EDUCADMIN_JWT_EXPIRACAO}
+      - EDUCADMIN_JWT_REFRESH_EXPIRACAO=${EDUCADMIN_JWT_REFRESH_EXPIRACAO}
+      - EDUCADMIN_MINIO_SERVIDOR=${EDUCADMIN_MINIO_SERVIDOR}
+      - EDUCADMIN_MINIO_PORTA=${EDUCADMIN_MINIO_PORTA}
+      - EDUCADMIN_MINIO_USUARIO=${EDUCADMIN_MINIO_USUARIO}
+      - EDUCADMIN_MINIO_SENHA=${EDUCADMIN_MINIO_SENHA}
+      - EDUCADMIN_MINIO_BUCKET=${EDUCADMIN_MINIO_BUCKET}
+      - EDUCADMIN_DOMINIO_BASE=${EDUCADMIN_DOMINIO_BASE}
+    ports:
+      - "${EDUCADMIN_PORTA_API:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: educadmin_web
+    restart: always
+    environment:
+      - EDUCADMIN_AMBIENTE=${EDUCADMIN_AMBIENTE}
+      - NEXT_PUBLIC_API_URL=http://localhost:${EDUCADMIN_PORTA_API:-3000}
+    ports:
+      - "${EDUCADMIN_PORTA_WEB:-3001}:3001"
+    depends_on:
+      - api
+
+  nginx:
+    image: nginx:alpine
+    container_name: educadmin_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - web
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

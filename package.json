@@ -1,0 +1,25 @@
+{
+  "name": "educadmin",
+  "version": "1.0.0",
+  "description": "EducAdmin - Sistema Open Source de Gestão Escolar",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "pacotes/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev --workspace=api",
+    "dev:web": "npm run dev --workspace=web",
+    "build:api": "npm run build --workspace=api",
+    "build:web": "npm run build --workspace=web",
+    "test:api": "npm run test --workspace=api",
+    "test:web": "npm run test --workspace=web"
+  },
+  "keywords": [
+    "educacao",
+    "gestao-escolar",
+    "open-source"
+  ],
+  "author": "EducAdmin",
+  "license": "AGPL-3.0"
+}
