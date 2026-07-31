@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export const TopMenu: React.FC = () => {
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const scrollRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     let ticking = false;
@@ -9,7 +9,9 @@ export const TopMenu: React.FC = () => {
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setLastScrollY(window.scrollY);
+          if (scrollRef.current) {
+            scrollRef.current.textContent = window.scrollY.toString();
+          }
           ticking = false;
         });
         ticking = true;
@@ -17,12 +19,16 @@ export const TopMenu: React.FC = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    // Initialize value
+    if (scrollRef.current) {
+      scrollRef.current.textContent = window.scrollY.toString();
+    }
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <div style={{ position: 'fixed', top: 0, width: '100%', backgroundColor: 'white' }}>
-      Top Menu - Scroll Y: {lastScrollY}
+      Top Menu - Scroll Y: <span ref={scrollRef}>0</span>
     </div>
   );
 };
