@@ -1,0 +1,103 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: educadmin_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${EDUCADMIN_BD_USUARIO}
+      POSTGRES_PASSWORD: ${EDUCADMIN_BD_SENHA}
+      POSTGRES_DB: ${EDUCADMIN_BD_NOME}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${EDUCADMIN_BD_USUARIO} -d ${EDUCADMIN_BD_NOME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: educadmin_redis_prod
+    restart: always
+    volumes:
+      - redis_data_prod:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio
+    container_name: educadmin_minio_prod
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${EDUCADMIN_MINIO_USUARIO}
+      MINIO_ROOT_PASSWORD: ${EDUCADMIN_MINIO_SENHA}
+    volumes:
+      - minio_data_prod:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  api:
+    image: educadmin_api:latest
+    container_name: educadmin_api_prod
+    restart: always
+    environment:
+      - EDUCADMIN_AMBIENTE=producao
+      - EDUCADMIN_PORTA_API=3000
+      - EDUCADMIN_BD_SERVIDOR=postgres
+      - EDUCADMIN_BD_PORTA=5432
+      - EDUCADMIN_BD_NOME=${EDUCADMIN_BD_NOME}
+      - EDUCADMIN_BD_USUARIO=${EDUCADMIN_BD_USUARIO}
+      - EDUCADMIN_BD_SENHA=${EDUCADMIN_BD_SENHA}
+      - EDUCADMIN_REDIS_SERVIDOR=redis
+      - EDUCADMIN_REDIS_PORTA=6379
+      - EDUCADMIN_JWT_SEGREDO=${EDUCADMIN_JWT_SEGREDO}
+      - EDUCADMIN_JWT_EXPIRACAO=${EDUCADMIN_JWT_EXPIRACAO}
+      - EDUCADMIN_JWT_REFRESH_EXPIRACAO=${EDUCADMIN_JWT_REFRESH_EXPIRACAO}
+      - EDUCADMIN_MINIO_SERVIDOR=minio
+      - EDUCADMIN_MINIO_PORTA=9000
+      - EDUCADMIN_MINIO_USUARIO=${EDUCADMIN_MINIO_USUARIO}
+      - EDUCADMIN_MINIO_SENHA=${EDUCADMIN_MINIO_SENHA}
+      - EDUCADMIN_MINIO_BUCKET=${EDUCADMIN_MINIO_BUCKET}
+      - EDUCADMIN_DOMINIO_BASE=${EDUCADMIN_DOMINIO_BASE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    image: educadmin_web:latest
+    container_name: educadmin_web_prod
+    restart: always
+    environment:
+      - EDUCADMIN_AMBIENTE=producao
+      - NEXT_PUBLIC_API_URL=https://api.${EDUCADMIN_DOMINIO_BASE}
+    depends_on:
+      - api
+
+  nginx:
+    image: nginx:alpine
+    container_name: educadmin_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - web
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  minio_data_prod:

@@ -1,0 +1,8 @@
+{
+  "name": "@educadmin/compartilhado",
+  "version": "1.0.0",
+  "description": "Tipos e utilitários compartilhados entre API e Web",
+  "main": "index.ts",
+  "types": "index.ts",
+  "private": true
+}
