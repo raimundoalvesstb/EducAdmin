@@ -33,4 +33,5 @@ COPY --from=builder --chown=node:node /app/pacotes/compartilhado ./pacotes/compa
 WORKDIR /app/apps/api
 EXPOSE 3000
 
+USER node
 CMD ["node", "dist/main"]
