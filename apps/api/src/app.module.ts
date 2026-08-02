@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { databaseConfig } from './configuracao/database.config';
+import { getDatabaseConfig } from './configuracao/database.config';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
 import { TenantsModule } from './tenants/tenants.module';
@@ -14,7 +15,14 @@ import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(databaseConfig),
+    ConfigModule.forRoot({
+      isGlobal: true, // Make ConfigModule global
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => getDatabaseConfig(configService),
+    }),
     UsuariosModule,
     AuthModule,
     TenantsModule,

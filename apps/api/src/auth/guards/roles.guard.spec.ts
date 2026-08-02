@@ -42,36 +42,29 @@ describe('RolesGuard', () => {
   });
 
   it('should return false if roles are required but there is no user', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMINISTRADOR']);
     const context = createMockExecutionContext(undefined);
 
     expect(guard.canActivate(context)).toBe(false);
   });
 
-  it('should return false if user has no roles array', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
+  it('should return false if user has no papel property', () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMINISTRADOR']);
     const context = createMockExecutionContext({ id: 1 });
 
     expect(guard.canActivate(context)).toBe(false);
   });
 
-  it('should return false if user has empty roles array', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
-    const context = createMockExecutionContext({ id: 1, roles: [] });
+  it('should return false if user does not have required papel', () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMINISTRADOR']);
+    const context = createMockExecutionContext({ id: 1, papel: 'PROFESSOR' });
 
     expect(guard.canActivate(context)).toBe(false);
   });
 
-  it('should return false if user does not have required roles', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
-    const context = createMockExecutionContext({ id: 1, roles: ['user'] });
-
-    expect(guard.canActivate(context)).toBe(false);
-  });
-
-  it('should return true if user has required role', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin', 'user']);
-    const context = createMockExecutionContext({ id: 1, roles: ['admin'] });
+  it('should return true if user has required papel', () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMINISTRADOR', 'PROFESSOR']);
+    const context = createMockExecutionContext({ id: 1, papel: 'ADMINISTRADOR' });
 
     expect(guard.canActivate(context)).toBe(true);
   });

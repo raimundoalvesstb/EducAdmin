@@ -1,45 +1,57 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AlunoServico } from './aluno.service';
 import { Aluno } from './aluno.entity';
+import { CurrentTenant } from '../auth/decorators/current-tenant.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { PapelUsuario } from '../usuarios/usuario.entity';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('alunos')
 export class AlunoController {
   constructor(private readonly alunoServico: AlunoServico) {}
 
-  // Nota: No futuro, pegaremos o tenantId do Request (JWT do usuário logado)
-  // Para testes e estrutura base, usaremos um header ou query temporário se necessário,
-  // mas o padrão ideal é injetar a partir do usuário autenticado.
-
-  // Extrai o tenant_id assumindo que o JWT envia o ID da instituição
-  // (req.user é preenchido pelo JwtStrategy)
-  private getTenantId(req: any): string {
-    return req.user?.tenant_id;
-  }
-
   @Get()
-  async listarTodos(@Request() req: any): Promise<Aluno[]> {
-    return this.alunoServico.listarPorTenant(this.getTenantId(req));
+  @Roles(PapelUsuario.DIRETOR, PapelUsuario.COORDENADOR, PapelUsuario.SECRETARIO, PapelUsuario.PROFESSOR)
+  async listarTodos(@CurrentTenant() tenantId: string): Promise<Aluno[]> {
+    return this.alunoServico.listarPorTenant(tenantId);
   }
 
   @Get(':id')
-  async buscarPorId(@Param('id') id: string, @Request() req: any): Promise<Aluno> {
-    return this.alunoServico.buscarPorId(id, this.getTenantId(req));
+  @Roles(PapelUsuario.DIRETOR, PapelUsuario.COORDENADOR, PapelUsuario.SECRETARIO, PapelUsuario.PROFESSOR)
+  async buscarPorId(
+    @Param('id') id: string,
+    @CurrentTenant() tenantId: string,
+  ): Promise<Aluno> {
+    return this.alunoServico.buscarPorId(id, tenantId);
   }
 
   @Post()
-  async criar(@Body() alunoData: Partial<Aluno>, @Request() req: any): Promise<Aluno> {
-    return this.alunoServico.criar(alunoData, this.getTenantId(req));
+  @Roles(PapelUsuario.DIRETOR, PapelUsuario.SECRETARIO)
+  async criar(
+    @Body() alunoData: Partial<Aluno>,
+    @CurrentTenant() tenantId: string,
+  ): Promise<Aluno> {
+    return this.alunoServico.criar(alunoData, tenantId);
   }
 
   @Put(':id')
-  async atualizar(@Param('id') id: string, @Body() alunoData: Partial<Aluno>, @Request() req: any): Promise<Aluno> {
-    return this.alunoServico.atualizar(id, alunoData, this.getTenantId(req));
+  @Roles(PapelUsuario.DIRETOR, PapelUsuario.SECRETARIO)
+  async atualizar(
+    @Param('id') id: string,
+    @Body() alunoData: Partial<Aluno>,
+    @CurrentTenant() tenantId: string,
+  ): Promise<Aluno> {
+    return this.alunoServico.atualizar(id, alunoData, tenantId);
   }
 
   @Delete(':id')
-  async remover(@Param('id') id: string, @Request() req: any): Promise<void> {
-    return this.alunoServico.remover(id, this.getTenantId(req));
+  @Roles(PapelUsuario.DIRETOR, PapelUsuario.SECRETARIO)
+  async remover(
+    @Param('id') id: string,
+    @CurrentTenant() tenantId: string,
+  ): Promise<void> {
+    return this.alunoServico.remover(id, tenantId);
   }
 }
