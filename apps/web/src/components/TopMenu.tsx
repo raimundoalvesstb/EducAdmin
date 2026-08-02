@@ -11,13 +11,14 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, BookCheck } from 'lucide-react';
 
 const navItems = [
   { name: 'Início', href: '/', icon: <Home className="w-5 h-5" /> },
   { name: 'Alunos', href: '/alunos', icon: <Users className="w-5 h-5" /> },
   { name: 'Turmas', href: '/turmas', icon: <BookOpen className="w-5 h-5" /> },
   { name: 'Matrículas', href: '/matriculas', icon: <ClipboardList className="w-5 h-5" /> },
+  { name: 'Diário', href: '/diario', icon: <BookCheck className="w-5 h-5" /> },
   { name: 'Configurações', href: '#config', icon: <Settings className="w-5 h-5" /> },
 ];
 
