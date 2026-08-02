@@ -1,14 +1,18 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { PapelUsuario } from '../usuarios/usuario.entity';
 import { TenantServico } from './tenant.service';
 import { Tenant } from './tenant.entity';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('tenants')
 export class TenantController {
   constructor(private readonly tenantServico: TenantServico) {}
 
   @Get()
+  @Roles(PapelUsuario.ADMINISTRADOR)
   async listarTodos(): Promise<Tenant[]> {
     return this.tenantServico.listarTodos();
   }

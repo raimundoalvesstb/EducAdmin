@@ -2,53 +2,85 @@
 
 import { motion } from "framer-motion";
 import { Users, BookOpen, Calendar, GraduationCap, TrendingUp, Settings } from "lucide-react";
-
-const bentoItems = [
-  {
-    title: "Alunos Matriculados",
-    value: "1.240",
-    icon: <Users className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1 md:col-span-2",
-    delay: 0.1,
-  },
-  {
-    title: "Turmas Ativas",
-    value: "42",
-    icon: <BookOpen className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1",
-    delay: 0.2,
-  },
-  {
-    title: "Média Escolar",
-    value: "7.8",
-    icon: <TrendingUp className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1",
-    delay: 0.3,
-  },
-  {
-    title: "Professores",
-    value: "85",
-    icon: <GraduationCap className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1 md:col-span-2",
-    delay: 0.4,
-  },
-  {
-    title: "Calendário",
-    value: "2 Eventos Hoje",
-    icon: <Calendar className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1 md:col-span-3 lg:col-span-2",
-    delay: 0.5,
-  },
-  {
-    title: "Configurações",
-    value: "Sistema",
-    icon: <Settings className="w-8 h-8 text-primary" />,
-    colSpan: "col-span-1 lg:col-span-1",
-    delay: 0.6,
-  }
-];
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [resumo, setResumo] = useState({ totalAlunos: 0, totalTurmas: 0, mediaGeral: "0.0", professoresAtivos: 0 });
+  const [carregando, setCarregando] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    const fetchResumo = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${apiUrl}/dashboard/resumo`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+          setResumo(await res.json());
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    fetchResumo();
+  }, [router]);
+
+  const bentoItems = [
+    {
+      title: "Alunos Matriculados",
+      value: carregando ? "..." : resumo.totalAlunos,
+      icon: <Users className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1 md:col-span-2",
+      delay: 0.1,
+    },
+    {
+      title: "Turmas Ativas",
+      value: carregando ? "..." : resumo.totalTurmas,
+      icon: <BookOpen className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1",
+      delay: 0.2,
+    },
+    {
+      title: "Média Escolar",
+      value: carregando ? "..." : resumo.mediaGeral,
+      icon: <TrendingUp className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1",
+      delay: 0.3,
+    },
+    {
+      title: "Professores",
+      value: carregando ? "..." : resumo.professoresAtivos,
+      icon: <GraduationCap className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1 md:col-span-2",
+      delay: 0.4,
+    },
+    {
+      title: "Calendário",
+      value: "N/A",
+      icon: <Calendar className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1 md:col-span-3 lg:col-span-2",
+      delay: 0.5,
+    },
+    {
+      title: "Configurações",
+      value: "Sistema",
+      icon: <Settings className="w-8 h-8 text-primary" />,
+      colSpan: "col-span-1 lg:col-span-1",
+      delay: 0.6,
+    }
+  ];
+
   return (
     <main className="flex-1 w-full max-w-6xl mx-auto flex flex-col gap-8">
       <motion.header

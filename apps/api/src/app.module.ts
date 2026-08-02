@@ -9,6 +9,8 @@ import { TenantsModule } from './tenants/tenants.module';
 import { AlunosModule } from './alunos/alunos.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { MatriculasModule } from './matriculas/matriculas.module';
+import { DiarioModule } from './diario/diario.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { MatriculasModule } from './matriculas/matriculas.module';
     AlunosModule,
     TurmasModule,
     MatriculasModule,
+    DiarioModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -15,7 +15,7 @@ export class AlunoController {
   // Extrai o tenant_id assumindo que o JWT envia o ID da instituição
   // (req.user é preenchido pelo JwtStrategy)
   private getTenantId(req: any): string {
-    return req.user?.tenant_id || req.headers['x-tenant-id'] || '123e4567-e89b-12d3-a456-426614174000';
+    return req.user?.tenant_id;
   }
 
   @Get()
