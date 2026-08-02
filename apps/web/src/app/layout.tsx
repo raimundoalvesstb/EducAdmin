@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Sistema Open Source de Gestão Escolar",
 };
 
-import { TopMenu } from "../components/TopMenu";
+import ClientLayout from "./ClientLayout";
 
 export default function RootLayout({
   children,
@@ -30,8 +30,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col pt-24 pb-8 px-4 sm:px-8">
-        <TopMenu />
-        {children}
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
