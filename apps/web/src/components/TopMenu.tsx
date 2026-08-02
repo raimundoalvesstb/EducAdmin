@@ -19,7 +19,7 @@ const navItems = [
   { name: 'Turmas', href: '/turmas', icon: <BookOpen className="w-5 h-5" /> },
   { name: 'Matrículas', href: '/matriculas', icon: <ClipboardList className="w-5 h-5" /> },
   { name: 'Diário', href: '/diario', icon: <BookCheck className="w-5 h-5" /> },
-  { name: 'Configurações', href: '#config', icon: <Settings className="w-5 h-5" /> },
+  { name: 'Notas', href: '/diario/notas', icon: <Settings className="w-5 h-5" /> },
 ];
 
 export const TopMenu: React.FC = () => {

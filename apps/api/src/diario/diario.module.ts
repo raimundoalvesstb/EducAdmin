@@ -5,11 +5,15 @@ import { Avaliacao } from './avaliacao.entity';
 import { Nota } from './nota.entity';
 import { FrequenciaServico } from './frequencia.service';
 import { FrequenciaController } from './frequencia.controller';
+import { AvaliacaoServico } from './avaliacao.service';
+import { AvaliacaoController } from './avaliacao.controller';
+import { NotaServico } from './nota.service';
+import { NotaController } from './nota.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Frequencia, Avaliacao, Nota])],
-  providers: [FrequenciaServico],
-  controllers: [FrequenciaController],
-  exports: [FrequenciaServico],
+  providers: [FrequenciaServico, AvaliacaoServico, NotaServico],
+  controllers: [FrequenciaController, AvaliacaoController, NotaController],
+  exports: [FrequenciaServico, AvaliacaoServico, NotaServico],
 })
 export class DiarioModule {}
