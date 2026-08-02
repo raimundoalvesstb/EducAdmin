@@ -4,51 +4,79 @@
   /* Default Theme (Light Blue Base) */
   --background: #f0f8ff;
   --foreground: #0f172a;
+
   --primary: #0ea5e9;
   --primary-foreground: #ffffff;
-  --surface: rgba(255, 255, 255, 0.7);
-  --surface-border: rgba(255, 255, 255, 0.5);
-  --muted: #e0f2fe;
-  --muted-foreground: #475569;
+
+  --secondary: #e0f2fe;
+  --secondary-foreground: #0284c7;
+
+  --surface: rgba(255, 255, 255, 0.65);
+  --surface-border: rgba(255, 255, 255, 0.4);
+
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+
   --accent: #38bdf8;
+  --accent-foreground: #ffffff;
+
+  --danger: #ef4444;
+  --danger-foreground: #ffffff;
+
+  --success: #22c55e;
+  --success-foreground: #ffffff;
 }
 
 .dark {
   --background: #020617;
   --foreground: #f8fafc;
+
   --primary: #38bdf8;
   --primary-foreground: #0f172a;
-  --surface: rgba(15, 23, 42, 0.6);
+
+  --secondary: #1e293b;
+  --secondary-foreground: #e0f2fe;
+
+  --surface: rgba(15, 23, 42, 0.65);
   --surface-border: rgba(255, 255, 255, 0.1);
+
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  --accent: #0ea5e9;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #020617;
-    --foreground: #f8fafc;
-    --primary: #38bdf8;
-    --primary-foreground: #0f172a;
-    --surface: rgba(15, 23, 42, 0.6);
-    --surface-border: rgba(255, 255, 255, 0.1);
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --accent: #0ea5e9;
-  }
+  --accent: #0ea5e9;
+  --accent-foreground: #ffffff;
+
+  --danger: #f87171;
+  --danger-foreground: #450a0a;
+
+  --success: #4ade80;
+  --success-foreground: #052e16;
 }
 
 .high-contrast {
   --background: #000000;
   --foreground: #ffffff;
+
   --primary: #ffff00;
   --primary-foreground: #000000;
+
+  --secondary: #ffffff;
+  --secondary-foreground: #000000;
+
   --surface: #000000;
   --surface-border: #ffffff;
+
   --muted: #000000;
   --muted-foreground: #ffffff;
+
   --accent: #ffff00;
+  --accent-foreground: #000000;
+
+  --danger: #ff0000;
+  --danger-foreground: #ffffff;
+
+  --success: #00ff00;
+  --success-foreground: #000000;
 }
 
 @theme inline {
@@ -56,11 +84,19 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-surface: var(--surface);
   --color-surface-border: var(--surface-border);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
   --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
@@ -73,12 +109,13 @@ body {
   min-height: 100vh;
 }
 
+/* Glassmorphism Classes */
 .glass {
   background: var(--surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--surface-border);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .high-contrast .glass {
@@ -86,4 +123,41 @@ body {
   background: var(--background);
   border: 2px solid var(--foreground);
   box-shadow: none;
+}
+
+/* Bento Grid Classes */
+.bento-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.bento-item {
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bento-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.08);
+}
+
+.high-contrast .bento-item:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.bento-item-large {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .bento-item-large {
+    grid-column: span 1;
+  }
 }
