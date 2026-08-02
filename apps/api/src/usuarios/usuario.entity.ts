@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Tenant } from '../tenants/tenant.entity';
 
 export enum PapelUsuario {
   ADMINISTRADOR = 'ADMINISTRADOR',
@@ -39,4 +40,8 @@ export class Usuario {
 
   @UpdateDateColumn({ name: 'atualizado_em' })
   atualizadoEm: Date;
+
+  @ManyToOne(() => Tenant)
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: Tenant;
 }
