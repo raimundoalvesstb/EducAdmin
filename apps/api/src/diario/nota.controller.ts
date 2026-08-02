@@ -9,7 +9,7 @@ export class NotaController {
   constructor(private readonly notaServico: NotaServico) {}
 
   private getTenantId(req: any): string {
-    return req.user?.tenant_id || req.headers['x-tenant-id'];
+    return req.user?.tenant_id;
   }
 
   @Get('avaliacao/:avaliacaoId')

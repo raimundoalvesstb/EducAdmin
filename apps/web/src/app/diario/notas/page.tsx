@@ -32,7 +32,7 @@ export default function NotasPage() {
   const [turmaSelecionada, setTurmaSelecionada] = useState<string>("");
 
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
-  const [avaliacaoSelecionada, setAvaliacacaoSelecionada] = useState<string>("");
+  const [avaliacaoSelecionada, setAvaliacaoSelecionada] = useState<string>("");
 
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
   const [notas, setNotas] = useState<Record<string, number>>({});
@@ -91,9 +91,9 @@ export default function NotasPage() {
           setMatriculas(mats);
           setAvaliacoes(avs);
           if (avs.length > 0) {
-              setAvaliacacaoSelecionada(avs[0].id);
+              setAvaliacaoSelecionada(avs[0].id);
           } else {
-              setAvaliacacaoSelecionada("");
+              setAvaliacaoSelecionada("");
           }
         }
       } catch (error) {
@@ -104,6 +104,33 @@ export default function NotasPage() {
     };
     carregarDadosTurma();
   }, [turmaSelecionada]);
+
+  // Quando avaliacao selecionada mudar, buscar histórico das notas para popular input
+  useEffect(() => {
+    if (!avaliacaoSelecionada) return;
+
+    const carregarNotasHistoricas = async () => {
+        const token = localStorage.getItem("access_token");
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        try {
+            const res = await fetch(`${apiUrl}/notas/avaliacao/${avaliacaoSelecionada}`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const notasBd = await res.json();
+                const dictNotas: Record<string, number> = {};
+                notasBd.forEach((n: any) => {
+                    if (n.matricula?.id) dictNotas[n.matricula.id] = n.valor;
+                });
+                setNotas(dictNotas);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar histórico de notas", error);
+        }
+    };
+
+    carregarNotasHistoricas();
+  }, [avaliacaoSelecionada]);
 
   const handleCriarAvaliacao = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -123,7 +150,7 @@ export default function NotasPage() {
         if (res.ok) {
             const avCriada = await res.json();
             setAvaliacoes([avCriada, ...avaliacoes]);
-            setAvaliacacaoSelecionada(avCriada.id);
+            setAvaliacaoSelecionada(avCriada.id);
             setIsModalOpen(false);
             setNovaAvaliacao({ nome: "", peso: 10, dataAvaliacao: new Date().toISOString().split('T')[0] });
         }
@@ -217,7 +244,7 @@ export default function NotasPage() {
                         avaliacoes.map(av => (
                             <button
                                 key={av.id}
-                                onClick={() => setAvaliacacaoSelecionada(av.id)}
+                                onClick={() => setAvaliacaoSelecionada(av.id)}
                                 className={`flex items-center justify-between p-3 rounded-xl transition-all ${avaliacaoSelecionada === av.id ? 'bg-secondary text-secondary-foreground shadow-md' : 'hover:bg-muted/50 text-foreground'}`}
                             >
                                 <span className="font-medium text-sm truncate pr-2">{av.nome}</span>

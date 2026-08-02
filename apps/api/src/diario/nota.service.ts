@@ -21,11 +21,34 @@ export class NotaServico {
   }
 
   async registrar(data: Partial<Nota>[], tenantId: string): Promise<Nota[]> {
-    const notas = data.map(n => this.notaRepository.create({
-      ...n,
-      tenant: { id: tenantId },
-    }));
-    // TODO: Ideally, we should perform an upsert here to avoid duplicate grades
-    return this.notaRepository.save(notas);
+    const notasSalvas: Nota[] = [];
+
+    for (const item of data) {
+      const matriculaId = item.matricula?.id;
+      const avaliacaoId = item.avaliacao?.id;
+
+      if (!matriculaId || !avaliacaoId) continue;
+
+      let notaExistente = await this.notaRepository.findOne({
+        where: {
+          matricula: { id: matriculaId },
+          avaliacao: { id: avaliacaoId },
+          tenant: { id: tenantId }
+        }
+      });
+
+      if (notaExistente) {
+        notaExistente.valor = item.valor!;
+        notasSalvas.push(await this.notaRepository.save(notaExistente));
+      } else {
+        const novaNota = this.notaRepository.create({
+          ...item,
+          tenant: { id: tenantId },
+        });
+        notasSalvas.push(await this.notaRepository.save(novaNota));
+      }
+    }
+
+    return notasSalvas;
   }
 }

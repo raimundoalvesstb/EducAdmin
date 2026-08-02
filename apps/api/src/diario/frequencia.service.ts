@@ -22,10 +22,35 @@ export class FrequenciaServico {
   }
 
   async registrar(data: Partial<Frequencia>[], tenantId: string): Promise<Frequencia[]> {
-    const frequencias = data.map(f => this.frequenciaRepository.create({
-      ...f,
-      tenant: { id: tenantId },
-    }));
-    return this.frequenciaRepository.save(frequencias);
+    const frequenciasSalvas: Frequencia[] = [];
+
+    for (const item of data) {
+      const matriculaId = item.matricula?.id;
+      const dataAula = item.dataAula;
+
+      if (!matriculaId || !dataAula) continue;
+
+      let freqExistente = await this.frequenciaRepository.findOne({
+        where: {
+          matricula: { id: matriculaId },
+          dataAula: dataAula,
+          tenant: { id: tenantId }
+        }
+      });
+
+      if (freqExistente) {
+        freqExistente.presenca = item.presenca!;
+        freqExistente.observacao = item.observacao || freqExistente.observacao;
+        frequenciasSalvas.push(await this.frequenciaRepository.save(freqExistente));
+      } else {
+        const novaFreq = this.frequenciaRepository.create({
+          ...item,
+          tenant: { id: tenantId },
+        });
+        frequenciasSalvas.push(await this.frequenciaRepository.save(novaFreq));
+      }
+    }
+
+    return frequenciasSalvas;
   }
 }

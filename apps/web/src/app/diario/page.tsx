@@ -62,37 +62,56 @@ export default function DiarioPage() {
     carregarTurmas();
   }, [router]);
 
-  // Buscar matriculados ao selecionar turma
+  // Buscar matriculados e histórico de chamada ao selecionar turma ou data
   useEffect(() => {
     if (!turmaSelecionada) return;
 
-    const carregarMatriculas = async () => {
+    const carregarMatriculasEHistorico = async () => {
       setCarregando(true);
       const token = localStorage.getItem("access_token");
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/matriculas/turma/${turmaSelecionada}`, {
+
+        // 1. Carrega os alunos matriculados
+        const resMat = await fetch(`${apiUrl}/matriculas/turma/${turmaSelecionada}`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
-        if (response.ok) {
-          const data = await response.json();
-          setMatriculas(data);
 
-          // Iniciar todos como PRESENTES por padrão na UI local
+        // 2. Carrega as presenças já registradas nesta turma para esta data
+        const resFreq = await fetch(`${apiUrl}/frequencias?turmaId=${turmaSelecionada}&dataAula=${dataAula}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (resMat.ok && resFreq.ok) {
+          const matriculadosData = await resMat.json();
+          const historicoFreqData = await resFreq.json();
+
+          setMatriculas(matriculadosData);
+
           const frequenciaInicial: Record<string, string> = {};
-          data.forEach((m: Matricula) => {
+          // Iniciar todos como PRESENTE
+          matriculadosData.forEach((m: Matricula) => {
               frequenciaInicial[m.id] = "PRESENTE";
           });
+
+          // Sobrescrever se já houver registro gravado no dia
+          historicoFreqData.forEach((freqRecord: any) => {
+              // Assegura pegar a chave da matricula do relacionamento se retornar populado
+              if (freqRecord.matricula?.id) {
+                 frequenciaInicial[freqRecord.matricula.id] = freqRecord.presenca;
+              }
+          });
+
           setFrequencia(frequenciaInicial);
         }
       } catch (error) {
-        console.error("Erro ao carregar matrículas:", error);
+        console.error("Erro ao carregar matrículas/histórico:", error);
       } finally {
         setCarregando(false);
       }
     };
-    carregarMatriculas();
-  }, [turmaSelecionada]);
+    carregarMatriculasEHistorico();
+  }, [turmaSelecionada, dataAula]);
 
   const alternarPresenca = (matriculaId: string) => {
       setFrequencia(prev => ({

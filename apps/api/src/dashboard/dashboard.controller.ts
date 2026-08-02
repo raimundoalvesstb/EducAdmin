@@ -8,7 +8,7 @@ export class DashboardController {
   constructor(private readonly dashboardServico: DashboardServico) {}
 
   private getTenantId(req: any): string {
-    return req.user?.tenant_id || req.headers['x-tenant-id'];
+    return req.user?.tenant_id;
   }
 
   @Get('resumo')

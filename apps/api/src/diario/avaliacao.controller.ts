@@ -9,7 +9,7 @@ export class AvaliacaoController {
   constructor(private readonly avaliacaoServico: AvaliacaoServico) {}
 
   private getTenantId(req: any): string {
-    return req.user?.tenant_id || req.headers['x-tenant-id'];
+    return req.user?.tenant_id;
   }
 
   @Get('turma/:turmaId')
