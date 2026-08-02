@@ -13,6 +13,6 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new HttpExceptionFilter());
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001); // Modificando a API para porta 3001 para não conflitar com frontend (3000)
 }
 bootstrap();
