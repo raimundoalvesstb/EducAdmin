@@ -20,7 +20,12 @@ export class AuthServico {
   }
 
   async login(usuario: any) {
-    const payload = { email: usuario.email, sub: usuario.id, papel: usuario.papel };
+    const payload = {
+      email: usuario.email,
+      sub: usuario.id,
+      papel: usuario.papel,
+      tenant_id: usuario.tenant?.id
+    };
     return {
       access_token: this.jwtService.sign(payload),
       usuario,
