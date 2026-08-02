@@ -7,6 +7,8 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { AlunosModule } from './alunos/alunos.module';
+import { TurmasModule } from './turmas/turmas.module';
+import { MatriculasModule } from './matriculas/matriculas.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { AlunosModule } from './alunos/alunos.module';
     AuthModule,
     TenantsModule,
     AlunosModule,
+    TurmasModule,
+    MatriculasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
