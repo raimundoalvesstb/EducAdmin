@@ -12,7 +12,7 @@ export class AuthServico {
 
   async validarUsuario(email: string, senha: string): Promise<any> {
     const usuario = await this.usuarioServico.buscarPorEmail(email);
-    if (usuario && bcrypt.compareSync(senha, usuario.senha_hash)) {
+    if (usuario && await bcrypt.compare(senha, usuario.senha_hash)) {
       const { senha_hash: _, ...resultado } = usuario;
       return resultado;
     }
@@ -20,7 +20,12 @@ export class AuthServico {
   }
 
   async login(usuario: any) {
-    const payload = { email: usuario.email, sub: usuario.id, papel: usuario.papel };
+    const payload = {
+      email: usuario.email,
+      sub: usuario.id,
+      papel: usuario.papel,
+      tenant_id: usuario.tenant?.id
+    };
     return {
       access_token: this.jwtService.sign(payload),
       usuario,

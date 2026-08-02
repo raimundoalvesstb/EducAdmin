@@ -1,36 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Tenant } from '../tenants/tenant.entity';
 
-export enum PapelUsuario {
-  ADMINISTRADOR = 'ADMINISTRADOR',
-  DIRETOR = 'DIRETOR',
-  COORDENADOR = 'COORDENADOR',
-  SECRETARIO = 'SECRETARIO',
-  PROFESSOR = 'PROFESSOR',
-  ALUNO = 'ALUNO',
-  RESPONSAVEL = 'RESPONSAVEL',
-}
-
-@Entity('usuarios')
-export class Usuario {
+@Entity('alunos')
+export class Aluno {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ name: 'nome_completo' })
   nomeCompleto: string;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ name: 'data_nascimento', type: 'date' })
+  dataNascimento: Date;
 
-  @Column()
-  senha_hash: string;
+  @Column({ nullable: true })
+  matricula: string;
 
-  @Column({
-    type: 'enum',
-    enum: PapelUsuario,
-    default: PapelUsuario.ALUNO,
-  })
-  papel: PapelUsuario;
+  @Column({ name: 'cpf', nullable: true })
+  cpf: string;
 
   @Column({ default: true })
   ativo: boolean;

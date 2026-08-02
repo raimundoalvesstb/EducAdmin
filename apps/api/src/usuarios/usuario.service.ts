@@ -11,7 +11,10 @@ export class UsuarioServico {
   ) {}
 
   async buscarPorEmail(email: string): Promise<Usuario | null> {
-    return this.usuarioRepository.findOne({ where: { email } });
+    return this.usuarioRepository.findOne({
+      where: { email },
+      relations: { tenant: true }
+    });
   }
 
   async buscarPorId(id: string): Promise<Usuario | null> {

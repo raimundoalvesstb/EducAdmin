@@ -10,9 +10,12 @@
 ▲ Next.js 16.2.12 (Turbopack)
 - Local:         http://localhost:3001
 - Network:       http://192.168.0.2:3001
-✓ Ready in 586ms
-⨯ Another next dev server is  GET /login 200 in 412ms (next.js: 113ms, application-code: 299ms)
-     87243
+- Environments: .env.local
+✓ Ready in 603ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          87243
 - Dir:          /app/apps/web
 - Log:          .next/dev/logs/next-development.log
 
