@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
     const isTestEnv = configService.get<string>('NODE_ENV') === 'test';
     let secretOrKey = configService.get<string>('JWT_SECRET');
 
