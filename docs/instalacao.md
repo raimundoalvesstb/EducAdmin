@@ -1,12 +1,8 @@
-# Instalação do EducAdmin
+# Guia de Instalação e Teste com Papéis (EducAdmin)
 
-Este guia orienta a instalação do EducAdmin via Docker, ideal para ambientes locais (desenvolvimento/homologação) e pequenas implantações em escolas.
+O EducAdmin usa a arquitetura SaaS Multi-Tenant. As credenciais padrões estão injetadas na migração ou seed:
+- `admin@educadmin.com.br` / `admin123`
+- `diretor@educadmin.com.br` / `diretor123`
+- `aluno@educadmin.com.br` / `aluno123`
 
-## Pré-requisitos
-- Docker 24.0+
-- Docker Compose v2.20+
-
-## Passo a passo
-1. Clone o repositório
-2. Copie `.env.exemplo` para `.env` e ajuste as variáveis.
-3. Rode `docker compose up -d`
+Seja por interface (GIF/vídeos capturados com Playwright) ou visualização em tela, cada papel terá renderizações limitadas a sua `RolesGuard`.
