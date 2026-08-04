@@ -5,4 +5,12 @@ export interface IRetornoPadrao<T> {
   codigo?: string;
 }
 
-export type PapelUsuario = 'super_admin' | 'admin_escola' | 'diretor' | 'coordenador' | 'secretario' | 'professor' | 'aluno' | 'responsavel' | 'gestor_rede' | 'tecnico';
+export enum PapelUsuario {
+  ADMINISTRADOR = 'ADMINISTRADOR',
+  DIRETOR = 'DIRETOR',
+  COORDENADOR = 'COORDENADOR',
+  SECRETARIO = 'SECRETARIO',
+  PROFESSOR = 'PROFESSOR',
+  ALUNO = 'ALUNO',
+  RESPONSAVEL = 'RESPONSAVEL',
+}

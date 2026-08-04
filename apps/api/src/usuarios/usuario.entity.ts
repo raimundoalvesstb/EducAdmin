@@ -1,15 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Tenant } from '../tenants/tenant.entity';
-
-export enum PapelUsuario {
-  ADMINISTRADOR = 'ADMINISTRADOR',
-  DIRETOR = 'DIRETOR',
-  COORDENADOR = 'COORDENADOR',
-  SECRETARIO = 'SECRETARIO',
-  PROFESSOR = 'PROFESSOR',
-  ALUNO = 'ALUNO',
-  RESPONSAVEL = 'RESPONSAVEL',
-}
+import { PapelUsuario } from '@educadmin/compartilhado';
 
 @Entity('usuarios')
 export class Usuario {

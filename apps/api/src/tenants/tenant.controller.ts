@@ -1,23 +1,25 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { PapelUsuario } from '../usuarios/usuario.entity';
 import { TenantServico } from './tenant.service';
 import { Tenant } from './tenant.entity';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { PapelUsuario } from '@educadmin/compartilhado';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('tenants')
 export class TenantController {
   constructor(private readonly tenantServico: TenantServico) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(PapelUsuario.ADMINISTRADOR)
-  async listarTodos(): Promise<Tenant[]> {
+  async listar(): Promise<Tenant[]> {
     return this.tenantServico.listarTodos();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(PapelUsuario.ADMINISTRADOR)
   async buscarPorId(@Param('id') id: string): Promise<Tenant> {
     return this.tenantServico.buscarPorId(id);
   }
